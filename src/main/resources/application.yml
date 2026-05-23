@@ -1,0 +1,69 @@
+spring:
+  application:
+    name: cms-notifications
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/cms_notifications_db}
+    username: ${SPRING_DATASOURCE_USERNAME:chemical}
+    password: ${SPRING_DATASOURCE_PASSWORD:chemical}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: cms-notifications
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  mail:
+    host: ${SMTP_HOST:localhost}
+    port: ${SMTP_PORT:1025}
+    username: ${SMTP_USERNAME:}
+    password: ${SMTP_PASSWORD:}
+    properties:
+      mail.smtp.auth: ${SMTP_AUTH:false}
+      mail.smtp.starttls.enable: ${SMTP_STARTTLS:false}
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI:http://localhost:8080/realms/chemical-platform}
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML
+    cache: true
+
+server:
+  port: ${SERVER_PORT:8080}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}
+  instance:
+    prefer-ip-address: true
+
+cms:
+  openapi:
+    gateway-url: ${CMS_OPENAPI_GATEWAY_URL:http://localhost:8088}
+  notifications:
+    mail:
+      enabled: ${CMS_NOTIFICATIONS_MAIL_ENABLED:true}
+      from: ${CMS_NOTIFICATIONS_MAIL_FROM:noreply@cms.local}
+      from-name: ${CMS_NOTIFICATIONS_MAIL_FROM_NAME:Chemical Management System}
+      reply-to: ${CMS_NOTIFICATIONS_MAIL_REPLY_TO:}
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    enabled: false
+
+logging:
+  level:
+    com.nuvemite.cms.notifications: INFO

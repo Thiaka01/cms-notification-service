@@ -1,0 +1,28 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+  kafka:
+    consumer:
+      auto-offset-reset: earliest
+  mail:
+    host: localhost
+    port: 3025
+
+cms:
+  notifications:
+    mail:
+      enabled: false
+      from: test@cms.local
+      from-name: CMS Test
+
+eureka:
+  client:
+    enabled: false
+
+logging:
+  level:
+    root: WARN
+    com.nuvemite.cms.notifications: INFO
