@@ -1,5 +1,10 @@
 package com.nuvemite.cms.notifications.domain;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -9,6 +14,9 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
 
+@Getter
+@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "notification_template")
 public class NotificationTemplate {
@@ -34,27 +42,11 @@ public class NotificationTemplate {
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
-    protected NotificationTemplate() {}
 
-    public UUID getId() {
-        return id;
-    }
 
-    public String getEventType() {
-        return eventType;
-    }
 
-    public NotificationChannel getChannel() {
-        return channel;
-    }
 
-    public String getSubject() {
-        return subject;
-    }
 
-    public String getBodyTemplate() {
-        return bodyTemplate;
-    }
 
     public boolean isActive() {
         return active;

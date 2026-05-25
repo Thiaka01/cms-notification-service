@@ -4,8 +4,8 @@ server:
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/cms_notifications_db
-    username: chemical
-    password: chemical
+    username: postgres
+    password: root
   kafka:
     bootstrap-servers: localhost:9092
     consumer:

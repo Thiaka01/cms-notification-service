@@ -1,5 +1,10 @@
 package com.nuvemite.cms.notifications.domain;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -7,6 +12,9 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
 
+@Getter
+@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "notification")
 public class Notification {
@@ -28,7 +36,6 @@ public class Notification {
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
-    protected Notification() {}
 
     public static Notification create(String eventType, String eventId, String subject, String body) {
         Notification notification = new Notification();
@@ -41,27 +48,9 @@ public class Notification {
         return notification;
     }
 
-    public UUID getId() {
-        return id;
-    }
 
-    public String getEventType() {
-        return eventType;
-    }
 
-    public String getEventId() {
-        return eventId;
-    }
 
-    public String getSubject() {
-        return subject;
-    }
 
-    public String getBody() {
-        return body;
-    }
 
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
 }

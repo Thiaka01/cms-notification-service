@@ -1,5 +1,10 @@
 package com.nuvemite.cms.notifications.domain;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -9,6 +14,9 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
 
+@Getter
+@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "notification_recipient")
 public class NotificationRecipient {
@@ -26,7 +34,6 @@ public class NotificationRecipient {
     @Column(name = "read_at")
     private Instant readAt;
 
-    protected NotificationRecipient() {}
 
     public static NotificationRecipient create(Notification notification, String keycloakSub) {
         NotificationRecipient recipient = new NotificationRecipient();
@@ -40,19 +47,7 @@ public class NotificationRecipient {
         this.readAt = Instant.now();
     }
 
-    public UUID getId() {
-        return id;
-    }
 
-    public Notification getNotification() {
-        return notification;
-    }
 
-    public String getKeycloakSub() {
-        return keycloakSub;
-    }
 
-    public Instant getReadAt() {
-        return readAt;
-    }
 }

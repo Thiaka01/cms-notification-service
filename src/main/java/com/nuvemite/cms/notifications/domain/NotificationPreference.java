@@ -1,5 +1,10 @@
 package com.nuvemite.cms.notifications.domain;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -8,6 +13,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.util.UUID;
 
+@Getter
+@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "notification_preference")
 public class NotificationPreference {
@@ -28,7 +36,6 @@ public class NotificationPreference {
     @Column(nullable = false)
     private boolean enabled = true;
 
-    protected NotificationPreference() {}
 
     public static NotificationPreference create(
             String keycloakSub, NotificationChannel channel, String eventType, boolean enabled) {
@@ -41,25 +48,10 @@ public class NotificationPreference {
         return preference;
     }
 
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
 
-    public UUID getId() {
-        return id;
-    }
 
-    public String getKeycloakSub() {
-        return keycloakSub;
-    }
 
-    public NotificationChannel getChannel() {
-        return channel;
-    }
 
-    public String getEventType() {
-        return eventType;
-    }
 
     public boolean isEnabled() {
         return enabled;

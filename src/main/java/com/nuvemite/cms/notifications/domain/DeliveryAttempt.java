@@ -1,5 +1,10 @@
 package com.nuvemite.cms.notifications.domain;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -11,6 +16,9 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
 
+@Getter
+@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "delivery_attempt")
 public class DeliveryAttempt {
@@ -39,7 +47,6 @@ public class DeliveryAttempt {
     @Column(name = "attempted_at", nullable = false)
     private Instant attemptedAt;
 
-    protected DeliveryAttempt() {}
 
     public static DeliveryAttempt pending(Notification notification, NotificationChannel channel) {
         DeliveryAttempt attempt = new DeliveryAttempt();
@@ -61,19 +68,7 @@ public class DeliveryAttempt {
         this.errorMessage = errorMessage;
     }
 
-    public UUID getId() {
-        return id;
-    }
 
-    public Notification getNotification() {
-        return notification;
-    }
 
-    public NotificationChannel getChannel() {
-        return channel;
-    }
 
-    public DeliveryStatus getStatus() {
-        return status;
-    }
 }
