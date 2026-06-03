@@ -1,6 +1,8 @@
 package com.nuvemite.cms.notifications.web;
 
 import com.nuvemite.cms.notifications.exception.AccessDeniedException;
+import com.nuvemite.cms.notifications.exception.ConflictException;
+import com.nuvemite.cms.notifications.exception.NotificationDeliveryException;
 import com.nuvemite.cms.notifications.exception.ResourceNotFoundException;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
