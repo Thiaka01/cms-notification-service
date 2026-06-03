@@ -1,55 +1,52 @@
 package com.nuvemite.cms.notifications.service;
 
-import com.nuvemite.cms.notifications.domain.DeliveryAttempt;
-import com.nuvemite.cms.notifications.domain.Notification;
 import com.nuvemite.cms.notifications.domain.NotificationChannel;
-import com.nuvemite.cms.notifications.domain.NotificationTemplate;
 import com.nuvemite.cms.notifications.email.EmailLayoutRenderer;
 import com.nuvemite.cms.notifications.email.PlainTextEmailRenderer;
 import com.nuvemite.cms.notifications.email.SmtpEmailSender;
-import com.nuvemite.cms.notifications.email.TemplateRenderer;
-import com.nuvemite.cms.notifications.repository.DeliveryAttemptRepository;
-import java.util.Map;
+import com.nuvemite.cms.notifications.exception.NotificationDeliveryException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class EmailNotificationService {
+public class EmailNotificationService implements NotificationService {
+
+    private static final Logger log = LoggerFactory.getLogger(EmailNotificationService.class);
 
     private final EmailLayoutRenderer layoutRenderer;
     private final SmtpEmailSender smtpEmailSender;
-    private final DeliveryAttemptRepository deliveryAttemptRepository;
 
     public EmailNotificationService(
             EmailLayoutRenderer layoutRenderer,
-            SmtpEmailSender smtpEmailSender,
-            DeliveryAttemptRepository deliveryAttemptRepository) {
+            SmtpEmailSender smtpEmailSender) {
         this.layoutRenderer = layoutRenderer;
         this.smtpEmailSender = smtpEmailSender;
-        this.deliveryAttemptRepository = deliveryAttemptRepository;
     }
 
-    @Transactional
-    public void send(
-            Notification notification,
-            NotificationTemplate template,
-            String recipientEmail,
-            Map<String, String> variables) {
-        DeliveryAttempt attempt = DeliveryAttempt.pending(notification, NotificationChannel.EMAIL);
-        deliveryAttemptRepository.save(attempt);
+    @Override
+    public NotificationChannel channel() {
+        return NotificationChannel.EMAIL;
+    }
 
-        try {
-            String bodyFragment = TemplateRenderer.render(template.getBodyTemplate(), variables);
-            String subject = template.getSubject() != null
-                    ? TemplateRenderer.render(template.getSubject(), variables)
-                    : variables.getOrDefault("subjectLine", "Notification");
-            String html = layoutRenderer.render(subject, bodyFragment);
-            String plain = PlainTextEmailRenderer.toPlainText(bodyFragment);
-            String messageId = smtpEmailSender.send(recipientEmail, subject, html, plain);
-            attempt.markSent(messageId);
-        } catch (Exception ex) {
-            attempt.markFailed(ex.getMessage());
+    @Override
+    public NotificationDeliveryResult send(NotificationMessage message) {
+        if (message.recipient() == null || message.recipient().isBlank()) {
+            throw new NotificationDeliveryException("Email recipient is required");
         }
-        deliveryAttemptRepository.save(attempt);
+        try {
+            log.debug(
+                    "Sending email notification for event {} id {} to {} using {} variables",
+                    message.eventCode(),
+                    message.eventId(),
+                    message.recipient(),
+                    message.templateData().size());
+            String html = layoutRenderer.render(message.subject(), message.content());
+            String plain = PlainTextEmailRenderer.toPlainText(message.content());
+            String messageId = smtpEmailSender.send(message.recipient(), message.subject(), html, plain);
+            return NotificationDeliveryResult.sent(messageId);
+        } catch (Exception ex) {
+            throw new NotificationDeliveryException("Failed to send email notification", ex);
+        }
     }
 }
