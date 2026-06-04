@@ -5,6 +5,9 @@ import com.nuvemite.cms.notifications.email.EmailLayoutRenderer;
 import com.nuvemite.cms.notifications.email.PlainTextEmailRenderer;
 import com.nuvemite.cms.notifications.email.SmtpEmailSender;
 import com.nuvemite.cms.notifications.exception.NotificationDeliveryException;
+import com.nuvemite.cms.notifications.messaging.EventTypes;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -16,12 +19,17 @@ public class EmailNotificationService implements NotificationService {
 
     private final EmailLayoutRenderer layoutRenderer;
     private final SmtpEmailSender smtpEmailSender;
+    private final Set<String> supportedEvents;
 
     public EmailNotificationService(
             EmailLayoutRenderer layoutRenderer,
             SmtpEmailSender smtpEmailSender) {
         this.layoutRenderer = layoutRenderer;
         this.smtpEmailSender = smtpEmailSender;
+        this.supportedEvents = EventTypes.systemDefinitions().stream()
+                .filter(def -> def.supportedChannels().contains(NotificationChannel.EMAIL))
+                .map(EventTypes.NotificationEventDefinition::eventCode)
+                .collect(Collectors.toUnmodifiableSet());
     }
 
     @Override
@@ -48,5 +56,25 @@ public class EmailNotificationService implements NotificationService {
         } catch (Exception ex) {
             throw new NotificationDeliveryException("Failed to send email notification", ex);
         }
+    }
+
+    @Override
+    public Set<String> supportedEventTypes() {
+        return supportedEvents;
+    }
+
+    @Override
+    public boolean supportsEventType(String eventCode) {
+        return supportedEvents.contains(eventCode);
+    }
+
+    @Override
+    public NotificationDeliveryResult sendForEvent(String eventCode, NotificationMessage message) {
+        if (!supportsEventType(eventCode)) {
+            throw new NotificationDeliveryException(
+                    "Email channel is not supported for event type: " + eventCode);
+        }
+        log.debug("Sending email notification for event type: {}", eventCode);
+        return send(message);
     }
 }
